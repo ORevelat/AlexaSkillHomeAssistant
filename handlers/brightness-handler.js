@@ -42,14 +42,14 @@ function changeBrightness(device, directive, payload, hass) {
 }
 
 function setBrightness(device, payload, hass) {
-	return hass.dimLight(device, utils.clamp(payload.brightness, 0, 99))
+	return hass.setLightPercent(device, utils.clamp(payload.brightness, 0, 100))
 	  		.then(() => payload.brightness);
 }
 
 function adjustBrightness(device, payload, hass) {
 	return hass.getDimLevel(device.cmd.dim)
 		.then((level) => {
-			const brightness = utils.clamp(Number(level) + payload.brightnessDelta, 0, 99);
-			return hass.dimLight(device, brightness).then(() => brightness);
+			const brightness = utils.clamp(Number(level) + payload.brightnessDelta, 0, 100);
+			return hass.setLightPercent(device, brightness).then(() => brightness);
 		});
 }

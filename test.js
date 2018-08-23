@@ -25,11 +25,11 @@ let request = {
             name: 'SetBrightness',
         },
         endpoint: {
-            endpointId: 'device-switch.neo_coolcam_power_plug_12a_switch'
+            endpointId: 'device-light.qubino_zmnhjd1_flush_dimmer_pilot_wire_level_2'
         },
         payload: {
-            brightness: 42
-          }
+            'brightness': 0
+        }
     }
 };
 let context = null;

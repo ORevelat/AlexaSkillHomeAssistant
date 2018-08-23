@@ -42,14 +42,14 @@ function changePower(device, directive, payload, hass) {
 }
 
 function setPowerLevel(device, payload, hass) {
-	return hass.dimLight(device, utils.clamp(payload.powerLevel, 0, 99))
+	return hass.setLightPercent(device, utils.clamp(payload.powerLevel, 0, 100))
 	  		.then(() => payload.brightness);
 }
 
 function adjustPowerLevel(device, payload, hass) {
-	return hass.getDimLevel(device.cmd.dim)
+	return hass.setLightPercent(device.cmd.dim)
 		.then((level) => {
-			const powerLevel = utils.clamp(Number(level) + payload.powerLevelDelta, 0, 99);
+			const powerLevel = utils.clamp(Number(level) + payload.powerLevelDelta, 0, 100);
 			return hass.dimLight(device, powerLevel).then(() => powerLevel);
 		});
 }

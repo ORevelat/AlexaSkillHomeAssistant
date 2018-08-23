@@ -13,6 +13,7 @@ class Hass {
             api: {
                 turn_on: cfg.config.api.turn_on,
                 turn_off: cfg.config.api.turn_off,
+                light_set: cfg.config.api.light_set,
                 state: cfg.config.api.state,
             }
         };
@@ -85,6 +86,25 @@ class Hass {
                     }
                 );
             });
+    }
+
+    setLightPercent(device, percentage) {
+        return this.getServerInfo()
+        .then((cfg) => {
+            return request({
+                    host: cfg.host,
+                    port: cfg.port,
+                    path: cfg.path + '/' + cfg.api.light_set,
+                    apikey: cfg.apikey,
+                    json: false,
+                },
+                'POST',
+                {
+                    'entity_id': device.id,
+                    'brightness_pct': percentage
+                }
+            );
+        });
     }
    
 }

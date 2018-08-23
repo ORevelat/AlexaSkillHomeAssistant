@@ -44,10 +44,10 @@ function createDimmerContextProps(device, jsonstate, jsontemp) {
 	];
 
 	if (device.categories == 'LIGHT') {
-		res.createContextProperty('Alexa.BrightnessController', 'brightness', Number(status));
+		context.push(res.createContextProperty('Alexa.BrightnessController', 'brightness', Number(jsonstate.attributes.brightness)));
 	}
 	else {
-		res.createContextProperty('Alexa.PowerLevelController', 'powerLevel', Number(status));
+		context.push(res.createContextProperty('Alexa.PowerLevelController', 'powerLevel', Number(jsonstate.attributes.level)));
 	}
 
 	if (jsontemp) {
