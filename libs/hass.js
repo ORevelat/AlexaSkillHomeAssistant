@@ -13,7 +13,11 @@ class Hass {
             api: {
                 turn_on: cfg.config.api.turn_on,
                 turn_off: cfg.config.api.turn_off,
-                light_set: cfg.config.api.light_set,
+                light_on: cfg.config.api.light_on,
+                light_off: cfg.config.api.light_off,
+                cover_open: cfg.config.api.cover_open,
+                cover_close: cfg.config.api.cover_close,
+                cover_set: cfg.config.api.cover_set,
                 state: cfg.config.api.state,
             }
         };
@@ -54,10 +58,7 @@ class Hass {
     }
 
     turnSwitchOn(device) {
-        if (device.categories == 'LIGHT')
-            return this.setLightPercent(device, 100);
-
-            return this.getServerInfo()
+        return this.getServerInfo()
             .then((cfg) => {
                 return request({
                         host: cfg.host,
@@ -75,9 +76,6 @@ class Hass {
     }
 
     turnSwitchOff(device) {
-        if (device.categories == 'LIGHT')
-            return this.setLightPercent(device, 0);
-
         return this.getServerInfo()
             .then((cfg) => {
                 return request({
@@ -95,38 +93,127 @@ class Hass {
             });
     }
 
+    turnLightOn(device) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.light_on,
+                        apikey: cfg.apikey,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                    }
+                );
+            });
+    }
+
+    turnLightOff(device) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.light_off,
+                        apikey: cfg.apikey,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                    }
+                );
+            });
+    }
+
     setLightPercent(device, percentage) {
         return this.getServerInfo()
-        .then((cfg) => {
-            let attrs = {
-                'entity_id': device.id,
-            };
-
-            if (device.categories == 'SWITCH')
-                attrs.position = percentage;
-            else
-                attrs.brightness_pct = percentage;
-
-            return request({
-                    host: cfg.host,
-                    port: cfg.port,
-                    path: cfg.path + '/' + ((device.categories == 'SWITCH') ? cfg.api.cover_set : cfg.api.light_set),
-                    apikey: cfg.apikey,
-                    json: false,
-                },
-                'POST',
-                attrs
-            );
-        });
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.light_on,
+                        apikey: cfg.apikey,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                        'brightness_pct': percentage
+                    }
+                );
+            });
     }
 
     getLightPercent(device) {
         return this.getDeviceStatus(device)
             .then((status) => {
-                if (device.categories == 'SWITCH')
-                   return parseInt(status.attributes.current_position);
-                else
-                    return parseInt(status.attributes.brightness * 100 / 255);
+                return parseInt(status.attributes.brightness * 100 / 255);
+            });
+    }
+
+    turnCoverOn(device, position) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.cover_open,
+                        apikey: cfg.apikey,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                    }
+                );
+            });
+    }
+
+    turnCoverOff(device, position) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.cover_close,
+                        apikey: cfg.apikey,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                    }
+                );
+            });
+    }
+
+    setCoverPosition(device, position) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.cover_set,
+                        apikey: cfg.apikey,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                        'position': position
+                    }
+                );
+            });
+    }
+
+    getCoverPosition(device) {
+        return this.getDeviceStatus(device)
+            .then((status) => {
+                return parseInt(status.attributes.current_position);
             });
     }
    

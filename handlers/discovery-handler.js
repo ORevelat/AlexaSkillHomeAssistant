@@ -22,9 +22,10 @@ function collectEndpoints(results) {
 function createEndpointFromDevice(device) {
 	switch (device.type)
 	{
-		case 'dimmer':
-		case 'shutter':
-			return createDimmerEndpoint(device);
+		case 'light':
+			return createLightEndpoint(device);
+		case 'cover':
+			return createCoverEndpoint(device);
 		case 'switch':
 			return createSwitchEndpoint(device);
 		case 'temp':
@@ -34,7 +35,7 @@ function createEndpointFromDevice(device) {
 	}
 }
 
-function createDimmerEndpoint(device) {
+function createLightEndpoint(device) {
 	const endpoint = createStandardDeviceEndpointProps(device);
 	endpoint.capabilities = [
 		createDiscoveryCapability('Alexa'),
@@ -42,12 +43,28 @@ function createDimmerEndpoint(device) {
 		createDiscoveryCapability('Alexa.PowerController', ['powerState']),
 	];
 
-	if (device.categories == 'LIGHT') {
-		endpoint.capabilities.push(createDiscoveryCapability('Alexa.BrightnessController', ['brightness']));
+	endpoint.capabilities.push(createDiscoveryCapability('Alexa.BrightnessController', ['brightness']));
+
+	// if we have temperature sensor add it
+	// allow to say 
+	//    alexa turn on the living room
+	//    alexa what is the temperature in the living room
+	if (device.cmd.includes("temp")) {
+		endpoint.capabilities.push(createDiscoveryCapability('Alexa.TemperatureSensor', ['temperature']));
 	}
-	else {
-		endpoint.capabilities.push(createDiscoveryCapability('Alexa.PowerLevelController', ['powerLevel']));
-	}
+
+	return endpoint;
+}
+
+function createCoverEndpoint(device) {
+	const endpoint = createStandardDeviceEndpointProps(device);
+	endpoint.capabilities = [
+		createDiscoveryCapability('Alexa'),
+		createDiscoveryCapability('Alexa.EndpointHealth', ['connectivity']),
+		createDiscoveryCapability('Alexa.PowerController', ['powerState']),
+	];
+
+ 	endpoint.capabilities.push(createDiscoveryCapability('Alexa.PowerLevelController', ['powerLevel']));
 
 	// if we have temperature sensor add it
 	// allow to say 

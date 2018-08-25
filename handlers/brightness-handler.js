@@ -16,7 +16,7 @@ module.exports = function brightnessHandler(hass, request) {
 }
 
 function changeBrightness(device, directive, payload, hass) {
-	if (device.type !== 'dimmer') {
+	if (device.type !== 'light') {
 		return Promise.reject(utils.error('INVALID_VALUE', `Directive is not supported for this device: ${device.id}`));
 	}
 

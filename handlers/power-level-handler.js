@@ -16,7 +16,7 @@ module.exports = function powerLevelHandler(hass, request) {
 }
 
 function changePower(device, directive, payload, hass) {
-	if (device.type !== 'dimmer') {
+	if (device.type !== 'cover') {
 		return Promise.reject(utils.error('INVALID_VALUE', `Directive is not supported for this device: ${device.id}`));
 	}
 
@@ -42,14 +42,14 @@ function changePower(device, directive, payload, hass) {
 }
 
 function setPowerLevel(device, payload, hass) {
-	return hass.setLightPercent(device, utils.clamp(payload.powerLevel, 0, 100))
-	  		.then(() => payload.brightness);
+	return hass.setCoverPosition(device, utils.clamp(payload.powerLevel, 0, 100))
+	  		.then(() => payload.powerLevel);
 }
 
 function adjustPowerLevel(device, payload, hass) {
-	return hass.getLightPercent(device)
+	return hass.getCoverPosition(device)
 		.then((level) => {
 			const powerLevel = utils.clamp(Number(level) + payload.powerLevelDelta, 0, 100);
-			return hass.dimLight(device, powerLevel).then(() => powerLevel);
+			return hass.setCoverPosition(device, powerLevel).then(() => powerLevel);
 		});
 }
