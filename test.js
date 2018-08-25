@@ -21,23 +21,22 @@ let request = {
     directive: {
         header: {
             correlationToken: 'the-token-aabb',
-            namespace: 'Alexa.BrightnessController',
-            name: 'SetBrightness',
+            namespace: 'Alexa.PowerController',
+            name: 'TurnOn',
         },
         endpoint: {
-            endpointId: 'device-light.qubino_zmnhjd1_flush_dimmer_pilot_wire_level_2'
+            endpointId: 'device-light@fibaro_system_fgd212_dimmer_2_level_18'
         },
         payload: {
-            'brightness': 0
         }
     }
 };
 let context = null;
 
-//let handler = discoveryHandler(hass, request, context, callback);
+let handler = discoveryHandler(hass, request, context, callback);
 //let handler = reportStateHandler(hass, request, context, callback);
 //let handler = powerHandler(hass, request, context, callback);
-let handler = brightnessHandler(hass, request, context, callback);
+//let handler = brightnessHandler(hass, request, context, callback);
 
 handler.then((response) => callback(null, response))
         .catch((err) => {

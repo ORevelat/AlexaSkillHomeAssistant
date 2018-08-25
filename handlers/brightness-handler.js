@@ -8,7 +8,7 @@ module.exports = function brightnessHandler(hass, request) {
 	const directive = request.directive.header.name || 'unknown';
 	const payload = request.directive.payload;
 	
-	const endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
+	let endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
 
 	return hass.getById(endpointId)
         .then((device) => changeBrightness(device, directive, payload, hass))
@@ -47,7 +47,7 @@ function setBrightness(device, payload, hass) {
 }
 
 function adjustBrightness(device, payload, hass) {
-	return hass.getDimLevel(device.cmd.dim)
+	return hass.getLightPercent(device)
 		.then((level) => {
 			const brightness = utils.clamp(Number(level) + payload.brightnessDelta, 0, 100);
 			return hass.setLightPercent(device, brightness).then(() => brightness);

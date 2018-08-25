@@ -7,7 +7,7 @@ module.exports = function powerHandler(hass, request) {
     const correlationToken = request.directive.header.correlationToken;
     const directive = request.directive.header.name || 'unknown';
 
-	const endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
+	let endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
 
     return hass.getById(endpointId)
         .then((device) => changePower(device, directive, hass))
@@ -16,6 +16,7 @@ module.exports = function powerHandler(hass, request) {
 
 function changePower(device, directive, hass) {
     let action = null;
+    
     if (directive === 'TurnOn') {
         action = hass.turnSwitchOn(device).then(() => 1);
     }

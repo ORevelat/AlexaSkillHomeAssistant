@@ -8,7 +8,7 @@ module.exports = function powerLevelHandler(hass, request) {
 	const directive = request.directive.header.name || 'unknown';
 	const payload = request.directive.payload;
 	
-	const [endpointType, endpointId] = request.directive.endpoint.endpointId.split('-');
+	let endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
 
 	return hass.getById(endpointId)
         .then((device) => changePower(device, directive, payload, hass))
@@ -47,7 +47,7 @@ function setPowerLevel(device, payload, hass) {
 }
 
 function adjustPowerLevel(device, payload, hass) {
-	return hass.setLightPercent(device.cmd.dim)
+	return hass.getLightPercent(device)
 		.then((level) => {
 			const powerLevel = utils.clamp(Number(level) + payload.powerLevelDelta, 0, 100);
 			return hass.dimLight(device, powerLevel).then(() => powerLevel);

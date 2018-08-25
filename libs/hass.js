@@ -21,7 +21,8 @@ class Hass {
     }
 
     getById(deviceId) {
-        const device = this.Commands.find((c) => c.id == deviceId);
+        const id = deviceId.replace("@", ".");
+        const device = this.Commands.find((c) => c.id == id);
         if (!device) {
             return Promise.reject(utils.error('NO_SUCH_ENDPOINT', `The device was not found: ${deviceId}`));
         }
@@ -53,7 +54,10 @@ class Hass {
     }
 
     turnSwitchOn(device) {
-        return this.getServerInfo()
+        if (device.categories == 'LIGHT')
+            return this.setLightPercent(device, 100);
+
+            return this.getServerInfo()
             .then((cfg) => {
                 return request({
                         host: cfg.host,
@@ -71,6 +75,9 @@ class Hass {
     }
 
     turnSwitchOff(device) {
+        if (device.categories == 'LIGHT')
+            return this.setLightPercent(device, 0);
+
         return this.getServerInfo()
             .then((cfg) => {
                 return request({
@@ -91,20 +98,36 @@ class Hass {
     setLightPercent(device, percentage) {
         return this.getServerInfo()
         .then((cfg) => {
+            let attrs = {
+                'entity_id': device.id,
+            };
+
+            if (device.categories == 'SWITCH')
+                attrs.position = percentage;
+            else
+                attrs.brightness_pct = percentage;
+
             return request({
                     host: cfg.host,
                     port: cfg.port,
-                    path: cfg.path + '/' + cfg.api.light_set,
+                    path: cfg.path + '/' + ((device.categories == 'SWITCH') ? cfg.api.cover_set : cfg.api.light_set),
                     apikey: cfg.apikey,
                     json: false,
                 },
                 'POST',
-                {
-                    'entity_id': device.id,
-                    'brightness_pct': percentage
-                }
+                attrs
             );
         });
+    }
+
+    getLightPercent(device) {
+        return this.getDeviceStatus(device)
+            .then((status) => {
+                if (device.categories == 'SWITCH')
+                   return parseInt(status.attributes.current_position);
+                else
+                    return parseInt(status.attributes.brightness * 100 / 255);
+            });
     }
    
 }

@@ -6,8 +6,8 @@ const res = require('../libs/responses');
 module.exports = function reportStateHandler(hass, request) {
 	const correlationToken = request.directive.header.correlationToken;
 
-	const endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
-	
+	let endpointId = request.directive.endpoint.endpointId.substr(request.directive.endpoint.endpointId.indexOf("-") + 1);
+
 	return hass.getById(endpointId)
 		.then((device) => reportState(device, hass))
 		.then((props) => res.createResponseObj(props, endpointId, correlationToken, 'Alexa', 'StateReport'));
@@ -30,7 +30,9 @@ function reportState(device, hass) {
 
 function createDeviceStateContextProps(device, jsonstate, jsontemp) {
 	switch (device.type) {
-		case 'dimmer': return createDimmerContextProps(device, jsonstate, jsontemp);
+		case 'dimmer':
+		case 'shutter':
+			return createDimmerContextProps(device, jsonstate, jsontemp);
 		case 'switch': return createSwitchContextProps(device, jsonstate, jsontemp);
 		case 'temp': return createTemperatureSensorContextProps(device, jsonstate);
 		default: return [];
@@ -43,15 +45,31 @@ function createDimmerContextProps(device, jsonstate, jsontemp) {
 		res.createContextProperty('Alexa.PowerController', 'powerState', jsonstate.state.toUpperCase()),
 	];
 
-	if (device.categories == 'LIGHT') {
-		context.push(res.createContextProperty('Alexa.BrightnessController', 'brightness', Number(jsonstate.attributes.brightness)));
+	if (device.type == 'dimmer') {
+		if (device.categories == 'LIGHT') {
+			if (jsonstate.state.toUpperCase() == "OFF")
+				jsonstate.attributes.brightness = 0;
+			context.push(res.createContextProperty('Alexa.BrightnessController', 'brightness', Number(jsonstate.attributes.brightness)));
+		}
+		else {
+			if (jsonstate.state.toUpperCase() == "OFF")
+				jsonstate.attributes.level = 0;
+
+			context.push(res.createContextProperty('Alexa.PowerLevelController', 'powerLevel', Number(jsonstate.attributes.level)));
+		}
 	}
-	else {
-		context.push(res.createContextProperty('Alexa.PowerLevelController', 'powerLevel', Number(jsonstate.attributes.level)));
+	else if (device.type == 'shutter') {
+		// only as switch not as light
+		if (jsonstate.state.toUpperCase() == "OPEN")
+			jsonstate.state = "ON"
+		else if (jsonstate.state.toUpperCase() == "CLOSE")
+			jsonstate.state = "OFF"
+
+		context.push(res.createContextProperty('Alexa.PowerLevelController', 'powerLevel', Number(jsonstate.attributes.current_position)));
 	}
 
 	if (jsontemp) {
-		const temperature = {value: Number(jsonstate.state), scale: 'CELSIUS'};
+		const temperature = {value: Number(jsontemp.state), scale: 'CELSIUS'};
 		context.push(res.createContextProperty('Alexa.TemperatureSensor', 'temperature', temperature));
 	}
 

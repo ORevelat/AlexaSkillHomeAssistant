@@ -23,6 +23,7 @@ function createEndpointFromDevice(device) {
 	switch (device.type)
 	{
 		case 'dimmer':
+		case 'shutter':
 			return createDimmerEndpoint(device);
 		case 'switch':
 			return createSwitchEndpoint(device);
@@ -52,7 +53,7 @@ function createDimmerEndpoint(device) {
 	// allow to say 
 	//    alexa turn on the living room
 	//    alexa what is the temperature in the living room
-	if (device.cmd.temp) {
+	if (device.cmd.includes("temp")) {
 		endpoint.capabilities.push(createDiscoveryCapability('Alexa.TemperatureSensor', ['temperature']));
 	}
 
@@ -68,7 +69,7 @@ function createSwitchEndpoint(device) {
 	];
 
 	// if we have temperature sensor add it
-	if (device.cmd.temp) {
+	if (device.cmd.includes("temp")) {
 		endpoint.capabilities.push(createDiscoveryCapability('Alexa.TemperatureSensor', ['temperature']));
 	}
 	
@@ -87,8 +88,9 @@ function createTemperatureSensorEndpoint(device) {
 }
 
 function createStandardDeviceEndpointProps(device) {
+	const id = device.id.replace(".", "@");
 	return {
-		endpointId: `device-${device.id}`,
+		endpointId: `device-${id}`,
 		manufacturerName: 'home assistant',
 		friendlyName: sanitizeFriendlyName(device.name),
 		description: device.description,
