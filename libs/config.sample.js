@@ -42,7 +42,7 @@ module.exports = {
 			categories: 'SWITCH',
 			id: 'switch.neo_coolcam_power_plug_12a_switch',
 			temp_id: 'sensor.oregontemphygro_728f5_temp',
-			cmd: [ 'state' ]
+			cmd: [ 'state', 'temp' ]
 		},
     ]
 };
