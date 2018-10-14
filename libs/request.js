@@ -12,7 +12,7 @@ module.exports = function request(opts, method = 'POST', json) {
 
 		opts.method = method;
 		opts.headers = {
-			'x-ha-access': opts.apikey,
+			'Authorization': 'Bearer ' + opts.token,
 			'Content-Type': 'application/json',
 			'Accept-Encoding': 'plain',
 			'Content-Length': obj.length

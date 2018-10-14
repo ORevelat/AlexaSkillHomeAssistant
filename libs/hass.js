@@ -9,7 +9,7 @@ class Hass {
             host: cfg.config.hass.host,
             port: cfg.config.hass.port,
             path: cfg.config.hass.path,
-            apikey: cfg.config.hass.apikey,
+            token: cfg.config.hass.token,
             api: {
                 turn_on: cfg.config.api.turn_on,
                 turn_off: cfg.config.api.turn_off,
@@ -18,6 +18,8 @@ class Hass {
                 cover_open: cfg.config.api.cover_open,
                 cover_close: cfg.config.api.cover_close,
                 cover_set: cfg.config.api.cover_set,
+                remote_on: cfg.config.api.remote_on,
+                remote_off: cfg.config.api.remote_off,
                 state: cfg.config.api.state,
             }
         };
@@ -48,7 +50,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.state + '/' + (istemp ? device.temp_id : device.id),
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: true,
                     },
                     'GET',
@@ -64,7 +66,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.turn_on,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -82,7 +84,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.turn_off,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -100,7 +102,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.light_on,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -118,7 +120,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.light_off,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -136,7 +138,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.light_on,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -162,7 +164,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.cover_open,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -180,7 +182,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.cover_close,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -198,7 +200,7 @@ class Hass {
                         host: cfg.host,
                         port: cfg.port,
                         path: cfg.path + '/' + cfg.api.cover_set,
-                        apikey: cfg.apikey,
+                        token: cfg.token,
                         json: false,
                     },
                     'POST',
@@ -217,6 +219,42 @@ class Hass {
             });
     }
    
+    turnRemoteOn(device) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.remote_on,
+                        token: cfg.token,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                        'activity': device.data.activity
+                    }
+                );
+            });
+    }
+
+    turnRemoteOff(device) {
+        return this.getServerInfo()
+            .then((cfg) => {
+                return request({
+                        host: cfg.host,
+                        port: cfg.port,
+                        path: cfg.path + '/' + cfg.api.remote_off,
+                        token: cfg.token,
+                        json: false,
+                    },
+                    'POST',
+                    {
+                        'entity_id': device.id,
+                    }
+                );
+            });
+    }
 }
 
 module.exports = Hass;
