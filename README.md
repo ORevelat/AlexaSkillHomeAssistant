@@ -7,3 +7,6 @@ Basé sur un skill de la box Vera.
 2018 08 20 - démarrage du projet / prise en main
 
 2018 09 10 - version stable pour lumière, température et volets roulants (avec une scene coté appli alexa pour pouvoir dire 'ouvre le volet de xxx')
+
+2018 10 10 - ajout du support préliminaire d'un harmony hub
+-> allume / éteint la télévision
