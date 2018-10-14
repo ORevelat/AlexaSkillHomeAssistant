@@ -22,24 +22,24 @@ let request = {
     directive: {
         header: {
             correlationToken: 'the-token-aabb',
-            namespace: 'Alexa.PowerLevelController',
-            name: 'SetPowerLevel',
+            namespace: 'Alexa.PowerController',
+            name: 'TurnOn',
         },
         endpoint: {
-            endpointId: 'device-cover@fibaro_system_fgrm222_roller_shutter_controller_2_level_3'
+            endpointId: 'device-remote@salon'
         },
-        payload: {
-            powerLevel: 100
-        }
+        // payload: {
+        //     powerLevel: 100
+        // }
     }
 };
 let context = null;
 
 //let handler = discoveryHandler(hass, request, context, callback);
 //let handler = reportStateHandler(hass, request, context, callback);
-//let handler = powerHandler(hass, request, context, callback);
+let handler = powerHandler(hass, request, context, callback);
 //let handler = brightnessHandler(hass, request, context, callback);
-let handler = powerlevelHandler(hass, request, context, callback);
+//let handler = powerlevelHandler(hass, request, context, callback);
 
 handler.then((response) => callback(null, response))
         .catch((err) => {

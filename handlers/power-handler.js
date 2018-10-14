@@ -23,6 +23,7 @@ function changePower(device, directive, hass) {
 		case 'light': return turnLight(device, directive, hass);
 		case 'cover': return turnCover(device, directive, hass);
 		case 'switch': return turnSwitch(device, directive, hass);
+		case 'remote': return turnRemote(device, directive, hass);
 		default:
             return Promise.reject(utils.error('INVALID_DIRECTIVE', `Unsupported device type ${device.type}`));
     }
@@ -71,6 +72,24 @@ function turnSwitch(device, directive, hass) {
     }
     else if (directive === 'TurnOff') {
         action = hass.turnSwitchOff(device).then(() => 0);
+    }
+
+    return action
+        .then((state) => {
+            return [
+                res.createContextProperty('Alexa.EndpointHealth', 'connectivity', {value: 'OK'}),
+                res.createContextProperty('Alexa.PowerController', 'powerState', Number(state) === 1 ? 'ON' : 'OFF', 1000)
+            ];
+    });
+}
+
+function turnRemote(device, directive, hass) {
+    let action = null;
+    if (directive === 'TurnOn') {
+        action = hass.turnRemoteOn(device).then(() => 1);
+    }
+    else if (directive === 'TurnOff') {
+        action = hass.turnRemoteOff(device).then(() => 0);
     }
 
     return action

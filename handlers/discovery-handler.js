@@ -30,6 +30,8 @@ function createEndpointFromDevice(device) {
 			return createSwitchEndpoint(device);
 		case 'temp':
 			return createTemperatureSensorEndpoint(device);
+		case 'remote':
+			return createRemoteEndpoint(device);
 		default:
 			return null;
 	}
@@ -99,6 +101,19 @@ function createTemperatureSensorEndpoint(device) {
 		createDiscoveryCapability('Alexa'),
 		createDiscoveryCapability('Alexa.EndpointHealth', ['connectivity']),
 		createDiscoveryCapability('Alexa.TemperatureSensor', ['temperature']),
+	];
+
+	return endpoint;
+}
+
+function createRemoteEndpoint(device) {
+	const endpoint = createStandardDeviceEndpointProps(device);
+	endpoint.capabilities = [
+		createDiscoveryCapability('Alexa'),
+		createDiscoveryCapability('Alexa.EndpointHealth', ['connectivity']),
+		createDiscoveryCapability('Alexa.PowerController', ['powerState']),
+		createDiscoveryCapability('Alexa.Speaker', ['volume', 'muted']),
+		createDiscoveryCapability('Alexa.ChannelController', ['channel']),
 	];
 
 	return endpoint;
